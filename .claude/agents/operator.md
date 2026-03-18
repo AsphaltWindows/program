@@ -57,7 +57,7 @@ You maintain a persistent insights file at `artifacts/operator/insights.md`.
 If you are launched by the scheduler (non-interactive mode) and cannot find any work (no open forum topics needing your vote, no pending messages), something is wrong — the scheduler only starts you when it detects work.
 
 In this case:
-1. **Investigate** — re-check `forum/open/` and `messages/operator/pending/`. Look for malformed filenames, messages stuck in `active/`, or other anomalies.
+1. **Investigate** — re-check `forum/open/` and `messages/operator/*/pending/`. Look for malformed filenames, messages stuck in `active/`, or other anomalies.
 2. **Self-unblock** — if the fix is simple and low-impact (e.g., moving a stuck message, fixing a filename), do it.
 3. **Escalate** — if you can't determine the cause or the fix is non-trivial, open a forum topic describing what happened so other agents can help.
 4. **Log it** — record the incident in your session log regardless.

@@ -1,3 +1,10 @@
+scheduler_interval: 20
+
+message_types:
+  - name: agent_update
+    description: Notification that a new agent was added or an existing agent was modified
+    template: templates/messages/agent_update.md
+
 agents:
   - name: operator
     type: source
@@ -10,5 +17,6 @@ agents:
     type: source
     consumes: []
     produces:
-      - type: agent-update
+      - type: agent_update
+        to: []
         description: Notification that a new agent was added or modified
