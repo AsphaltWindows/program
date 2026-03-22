@@ -8,7 +8,7 @@ set -euo pipefail
 # Fresh install: creates directory structure and copies all framework files.
 # Upgrade: copies framework files over existing ones, preserves project-specific
 # files (pipeline.yaml, agent definitions, artifacts, messages, forum topics).
-# The architect agent handles any pipeline migration after upgrade.
+# The pipeline_builder agent handles any pipeline migration after upgrade.
 
 FRAMEWORK_DIR="$(cd "$(dirname "$0")" && pwd)"
 TARGET_DIR="${1:-.}"
@@ -24,9 +24,9 @@ fi
 
 # Create directory structure (idempotent)
 mkdir -p "$TARGET_DIR"/{artifacts,forum/{open,closed},templates}
-mkdir -p "$TARGET_DIR"/agents/{operator,architect}
+mkdir -p "$TARGET_DIR"/agents/{operator,pipeline_builder}
 mkdir -p "$TARGET_DIR"/messages/operator
-mkdir -p "$TARGET_DIR"/messages/architect
+mkdir -p "$TARGET_DIR"/messages/pipeline_builder
 mkdir -p "$TARGET_DIR"/scripts
 mkdir -p "$TARGET_DIR"/.claude/agents
 
@@ -35,9 +35,9 @@ cp "$FRAMEWORK_DIR/framework.md" "$TARGET_DIR/"
 cp "$FRAMEWORK_DIR/scripts/"*.sh "$TARGET_DIR/scripts/"
 cp -r "$FRAMEWORK_DIR/templates/"* "$TARGET_DIR/templates/"
 cp "$FRAMEWORK_DIR/agents/operator/agent.yaml" "$TARGET_DIR/agents/operator/"
-cp "$FRAMEWORK_DIR/agents/architect/agent.yaml" "$TARGET_DIR/agents/architect/"
+cp "$FRAMEWORK_DIR/agents/pipeline_builder/agent.yaml" "$TARGET_DIR/agents/pipeline_builder/"
 cp "$FRAMEWORK_DIR/.claude/agents/operator.md" "$TARGET_DIR/.claude/agents/operator.md"
-cp "$FRAMEWORK_DIR/.claude/agents/architect.md" "$TARGET_DIR/.claude/agents/architect.md"
+cp "$FRAMEWORK_DIR/.claude/agents/pipeline_builder.md" "$TARGET_DIR/.claude/agents/pipeline_builder.md"
 
 chmod +x "$TARGET_DIR/scripts/"*.sh
 
@@ -50,12 +50,12 @@ if [ "$IS_UPGRADE" = true ]; then
     echo "Done. Framework files upgraded."
     echo ""
     echo "Next steps:"
-    echo "  1. Start a session with the architect to reconcile the pipeline"
+    echo "  1. Start a session with the pipeline_builder to reconcile the pipeline"
     echo "     with any framework changes"
 else
-    echo "Done. Pipeline initialized with operator and architect agents."
+    echo "Done. Pipeline initialized with operator and pipeline_builder agents."
     echo ""
     echo "Next steps:"
-    echo "  1. Start a session with the architect to add pipeline agents"
+    echo "  1. Start a session with the pipeline_builder to add pipeline agents"
     echo "  2. Run scripts/run_scheduler.sh to process pending work"
 fi
