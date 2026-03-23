@@ -8,8 +8,6 @@ message_types:
 agents:
   - name: operator
     type: source
-    scheduled: false
-    close_vote_required: false
     consumes: []
     produces: []
 

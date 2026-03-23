@@ -29,28 +29,30 @@ sed -i "/^## Close Votes$/a VOTE:${AGENT_NAME}" "$FULL_PATH"
 echo "Vote added for '$AGENT_NAME'."
 
 # Check if all required agents have voted
-# Agents with close_vote_required: false are excluded
+# Agents with close_vote_required: false in their agent.yaml are excluded
 PIPELINE="$ROOT_DIR/pipeline.yaml"
 REQUIRED_AGENTS=""
-CURRENT_AGENT=""
-VOTE_REQUIRED=true
+IN_AGENTS_SECTION=false
 
 while IFS= read -r line; do
-    if echo "$line" | grep -q '^\s*-\?\s*name:'; then
-        # Save previous agent if vote was required
-        if [ -n "$CURRENT_AGENT" ] && [ "$VOTE_REQUIRED" = true ]; then
-            REQUIRED_AGENTS="$REQUIRED_AGENTS $CURRENT_AGENT"
+    if echo "$line" | grep -q '^[a-z_]*:'; then
+        if echo "$line" | grep -q '^agents:'; then
+            IN_AGENTS_SECTION=true
+        else
+            IN_AGENTS_SECTION=false
         fi
-        CURRENT_AGENT=$(echo "$line" | sed 's/.*name:\s*//' | tr -d ' ')
-        VOTE_REQUIRED=true
-    elif echo "$line" | grep -q '^\s*close_vote_required:\s*false'; then
-        VOTE_REQUIRED=false
+        continue
+    fi
+    [ "$IN_AGENTS_SECTION" = true ] || continue
+    if echo "$line" | grep -q '^\s*-\?\s*name:'; then
+        AGENT_NAME=$(echo "$line" | sed 's/.*name:\s*//' | tr -d ' ')
+        AGENT_YAML="$ROOT_DIR/agents/${AGENT_NAME}/agent.yaml"
+        if [ -f "$AGENT_YAML" ] && grep -q '^\s*close_vote_required:\s*false' "$AGENT_YAML"; then
+            continue
+        fi
+        REQUIRED_AGENTS="$REQUIRED_AGENTS $AGENT_NAME"
     fi
 done < "$PIPELINE"
-# Don't forget the last agent
-if [ -n "$CURRENT_AGENT" ] && [ "$VOTE_REQUIRED" = true ]; then
-    REQUIRED_AGENTS="$REQUIRED_AGENTS $CURRENT_AGENT"
-fi
 
 ALL_VOTED=true
 for AGENT in $REQUIRED_AGENTS; do
